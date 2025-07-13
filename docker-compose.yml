@@ -1,4 +1,6 @@
-version: '3'
+# curl https://cgm.nophir.com --resolve 'cgm.nophir.com"80:192.168.31.6'
+
+# curl  http://cgm.nophir.com/.well-known/acme-challenge/OiRyVSCLgzWbGZlt9iaCB1mZoXXxJdFb9KpgpD8rV0E 
 
 x-logging:
   &default-logging
@@ -10,6 +12,7 @@ x-logging:
 services:
   mongo:
     image: mongo:4.4
+    restart: always
     volumes:
       - ${NS_MONGO_DATA_DIR:-./mongo-data}:/data/db:cached
     logging: *default-logging
@@ -20,11 +23,13 @@ services:
     restart: always
     depends_on:
       - mongo
+    ports:
+     - "1337:1337"
     labels:
       - 'traefik.enable=true'
       # Change the below Host from `localhost` to be the web address where Nightscout is running.
       # Also change the email address in the `traefik` service below.
-      - 'traefik.http.routers.nightscout.rule=Host(`localhost`)'
+      - 'traefik.http.routers.nightscout.rule=Host(`cgm.nophir.com`)'
       - 'traefik.http.routers.nightscout.entrypoints=websecure'
       - 'traefik.http.routers.nightscout.tls.certresolver=le'
     logging: *default-logging
@@ -32,6 +37,9 @@ services:
       ### Variables for the container
       NODE_ENV: production
       TZ: Etc/UTC
+      BRIDGE_USER_NAME: danitdex 
+      BRIDGE_PASSWORD: ofir5902
+      BRIDGE_SERVER: EU
 
       ### Overridden variables for Docker Compose setup
       # The `nightscout` service can use HTTP, because we use `traefik` to serve the HTTPS
@@ -48,12 +56,12 @@ services:
       MONGO_CONNECTION: mongodb://mongo:27017/nightscout
 
       # API_SECRET - A secret passphrase that must be at least 12 characters long.
-      API_SECRET: change_me
+      API_SECRET: ofir5902ofir5902
 
       ### Features
       # ENABLE - Used to enable optional features, expects a space delimited list, such as: careportal rawbg iob
       # See https://github.com/nightscout/cgm-remote-monitor#plugins for details
-      ENABLE: careportal rawbg iob
+      ENABLE: careportal rawbg bridge iob iob cob cage sage iage connect pump override loop 
 
       # AUTH_DEFAULT_ROLES (readable) - possible values readable, denied, or any valid role name.
       # When readable, anyone can view Nightscout without a token. Setting it to denied will require
@@ -66,17 +74,20 @@ services:
   traefik:
     image: traefik:latest
     container_name: 'traefik'
+    restart: always
     command:
+      - "--log.level=DEBUG"
       - '--providers.docker=true'
       - '--providers.docker.exposedbydefault=false'
       - '--entrypoints.web.address=:80'
       - '--entrypoints.web.http.redirections.entrypoint.to=websecure'
       - '--entrypoints.websecure.address=:443'
-      - "--certificatesresolvers.le.acme.httpchallenge=true"
-      - "--certificatesresolvers.le.acme.httpchallenge.entrypoint=web"
+      # - "--certificatesresolvers.le.acme.httpchallenge=true"
+      # - "--certificatesresolvers.le.acme.httpchallenge.entrypoint=web"
       - '--certificatesresolvers.le.acme.storage=/letsencrypt/acme.json'
+      - "--certificatesresolvers.le.acme.tlschallenge=true"
       # Change the below to match your email address
-      - '--certificatesresolvers.le.acme.email=example@example.com'
+      - '--certificatesresolvers.le.acme.email=ofir@nophir.com'
     ports:
       - '443:443'
       - '80:80'
@@ -84,3 +95,5 @@ services:
       - './letsencrypt:/letsencrypt'
       - '/var/run/docker.sock:/var/run/docker.sock:ro'
     logging: *default-logging
+
+
