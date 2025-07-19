@@ -61,7 +61,26 @@ services:
       ### Features
       # ENABLE - Used to enable optional features, expects a space delimited list, such as: careportal rawbg iob
       # See https://github.com/nightscout/cgm-remote-monitor#plugins for details
-      ENABLE: careportal rawbg bridge iob iob cob cage sage iage connect pump override loop 
+      ENABLE: careportal bridge iob cob cage sage connect pump override openaps profile
+      SHOW_FORECAST: openaps 
+      SHOW_PLUGINS: openaps pump iob sage cage careportal
+      THEME: colorblindfriendly 
+      DISPLAY_UNITS: "mg/dl"
+      BG_HIGH: "260"
+      BG_TARGET_TOP: "180"
+      BG_TARGET_BOTTOM: "80"
+      BG_LOW: "55"
+      BASAL_RENDER: "default"
+      BOLUS_RENDER_FORMAT: "minimal"
+      BOLUS_RENDER_FORMAT_SMALL: "default"
+      BOLUS_RENDER_OVER: "0.1"
+      DBSIZE_MAX: "20000"
+      DEVICESTATUS_ADVANCED: "true"
+      SCALE_Y: log
+      OPENAPS_COLOR_PREDICTION_LINES: true 
+
+
+
 
       # AUTH_DEFAULT_ROLES (readable) - possible values readable, denied, or any valid role name.
       # When readable, anyone can view Nightscout without a token. Setting it to denied will require
