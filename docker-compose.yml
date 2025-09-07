@@ -11,6 +11,8 @@ x-logging:
 
 services:
   mongo:
+    networks:
+      - my-shared-net    
     image: mongo:4.4
     restart: always
     volumes:
@@ -18,6 +20,8 @@ services:
     logging: *default-logging
 
   nightscout:
+    networks:
+      - my-shared-net    
     image: nightscout/cgm-remote-monitor:latest
     container_name: nightscout
     restart: always
@@ -114,5 +118,10 @@ services:
       - './letsencrypt:/letsencrypt'
       - '/var/run/docker.sock:/var/run/docker.sock:ro'
     logging: *default-logging
+    networks:
+      - my-shared-net    
 
 
+networks:
+  my-shared-net:
+    external: true
